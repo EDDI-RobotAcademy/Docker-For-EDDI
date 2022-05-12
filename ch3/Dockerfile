@@ -1,4 +1,5 @@
-FROM ubuntu:16.04
+FROM busybox:latest
 
-RUN apt-get update && apt-get install -y cowsay fortune
-ENTRYPOINT ["/usr/games/cowsay"]
+RUN echo "동작!"
+#RUN /bin/bash -c echo "동작 불가!"
+RUN /bin/sh -c echo "동작!"
