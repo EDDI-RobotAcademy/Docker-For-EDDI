@@ -17,21 +17,21 @@ name_ros_version=${name_ros_version:="melodic"}
 name_catkin_workspace=${name_catkin_workspace:="catkin_ws"}
 
 echo "[Update the package lists]"
-sudo apt update -y
+apt update -y
 
 echo "[Install build environment, the chrony, ntpdate and set the ntpdate]"
-sudo apt install -y chrony ntpdate curl build-essential
-sudo ntpdate ntp.ubuntu.com
+apt install -y chrony ntpdate curl build-essential
+ntpdate ntp.ubuntu.com
 
 echo "[Add the ROS repository]"
 if [ ! -e /etc/apt/sources.list.d/ros-latest.list ]; then
-  sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu ${name_os_version} main\" > /etc/apt/sources.list.d/ros-latest.list"
+  sh -c "echo \"deb http://packages.ros.org/ros/ubuntu ${name_os_version} main\" > /etc/apt/sources.list.d/ros-latest.list"
 fi
 
 echo "[Download the ROS keys]"
 roskey=`apt-key list | grep "Open Robotics"`
 if [ -z "$roskey" ]; then
-  curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+  curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -
 fi
 
 echo "[Check the ROS keys]"
@@ -44,20 +44,20 @@ else
 fi
 
 echo "[Update the package lists]"
-sudo apt update -y
+apt update -y
 
 echo "[Install the ros-desktop-full and all rqt plugins]"
-sudo apt install -y ros-$name_ros_version-desktop-full ros-$name_ros_version-rqt-*
+apt install -y ros-$name_ros_version-desktop-full ros-$name_ros_version-rqt-*
 
 echo "[Environment setup and getting rosinstall]"
 source /opt/ros/$name_ros_version/setup.sh
-sudo apt install -y python-rosinstall python-rosinstall-generator python-wstool build-essential git
+apt install -y python-rosinstall python-rosinstall-generator python-wstool build-essential git
 
 echo "[Install rosdep]"
-sudo apt install python-rosdep
+apt install python-rosdep
 
 echo "[Initialize rosdep and Update]"
-sudo sh -c "rosdep init"
+sh -c "rosdep init"
 rosdep update
 
 echo "[Make the catkin workspace and test the catkin_make]"

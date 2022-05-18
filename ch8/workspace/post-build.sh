@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 bash ./install_ros_melodic.sh
 
