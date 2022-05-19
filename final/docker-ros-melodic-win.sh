@@ -16,30 +16,32 @@
 #}
 #EOF
 
-id_res=$(id | grep docker)
-
-if [ -n "$id_res" ];
-then echo "docker가 이미 등록되어 있습니다!"
+docker_check=$(docker images | awk '{ print $1 }' | grep "ros/melodic")
+if [ -n "$docker_check" ];
+then
+	echo "이미 설치되어 있습니다!"
 else
-	echo "지금부터 docker를 등록합니다!"
-	sudo usermod -aG docker $USER
-	newgrp docker
-	exit
+	echo "도커 이미지 설치!"
+	docker build --no-cache --force-rm -f Dockerfile --build-arg HOST_USER=$USER -t ros/melodic:dev .
 fi
 
 USER_UID=$(id -u)
-TAG='bionic-melodic-dev'
-IMAGE='osrf/ros:melodic-desktop-full-bionic'
+TAG='dev'
+IMAGE='ros/melodic'
 TTY='--device=/dev/ttyACM0'
 
-xhost +local:docker
+#xhost +local:docker
 
 echo "IMAGE=" $IMAGE
 echo "TAG=" $TAG
 echo "USER_UID=" $USER_UID
 echo "USER=" $USER
-echo "IPADDR=" $(hostname -I | cut -d' ' -f1)
+#echo "IPADDR=" $(hostname -I | cut -d' ' -f1)
 echo "TTY=" $TTY
+
+USER="user2"
+
+echo $USER
 
 ENV_PARAMS=()
 OTHER_PARAMS=()
@@ -52,14 +54,15 @@ for ((a=0; a<"${#args[@]}"; ++a)); do
 	esac
 done
 
-docker run -it \
+cur_loc=$(pwd)
+
+winpty docker run -it \
 	--init \
 	--ipc=host \
 	--shm-size=8G \
 	--privileged \
 	--net=host \
 	-e DISPLAY=$DISPLAY \
-	-e XDG_RUNTIME_DIR=/run/user/$USER_UID \
 	-e QT_GRAPHICSSYSTEM=native \
 	-e CONTAINER_NAME=$TAG \
 	-e USER=$USER \
@@ -70,10 +73,9 @@ docker run -it \
 	${ENV_PARAMS[@]} \
 	-v /dev:/dev \
 	-v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-	-v workspace:/home/$USER/workspace \
-	--name=$TAG \
-	$IMAGE \
-	${OTHER_PARAMS[@]} \
-	/bin/bash
+	-v $cur_loc/workspace:/home/user2/workspace \
+	$IMAGE:$TAG \
+	${OTHER_PARAMS[@]}
+#	/bin/bash
 
 #export container_id=$(docker ps -l -q)

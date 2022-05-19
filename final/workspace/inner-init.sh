@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 cat /etc/apt/sources.list
 apt-get autoremove --purge --yes \
@@ -63,7 +63,7 @@ echo "alias cw='cd ~/catkin_ws'" >> $HOME/.bashrc
 echo "alias cs='cd ~/catkin_ws/src'" >> $HOME/.bashrc
 echo "alias cm='cd ~/catkin_ws && catkin_make'" >> $HOME/.bashrc
 
-source /opt/ros$ROS_DISTRO/setup.bash
+source /opt/ros/$ROS_DISTRO/setup.bash
 source /$HOME/catkin_ws/devel/setup.bash
 
 IPADDR=$(hostname -I | cut -d' ' -f1)

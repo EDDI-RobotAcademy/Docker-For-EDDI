@@ -27,9 +27,18 @@ else
 	exit
 fi
 
+docker_check=$(docker images | awk '{ print $1 }' | grep "ros/melodic")
+if [ -n "$docker_check" ];
+then
+	echo "도커 이미지 설치!"
+	docker build --no-cache --force-rm -f Dockerfile --build-arg HOST_USER=$USER -t ros/melodic:dev .
+else
+	echo "이미 설치되어 있습니다!"
+fi
+
 USER_UID=$(id -u)
-TAG='bionic-melodic-dev'
-IMAGE='osrf/ros:melodic-desktop-full-bionic'
+TAG='dev'
+IMAGE='ros/melodic'
 TTY='--device=/dev/ttyACM0'
 
 xhost +local:docker
