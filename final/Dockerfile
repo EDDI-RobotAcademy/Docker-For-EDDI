@@ -1,18 +1,19 @@
 FROM osrf/ros:melodic-desktop-full-bionic
 
-ENV DEBIAN_FRONTEND=noninteractive
+ARG DEBIAN_FRONTEND=noninteractive
+ARG HOST_USER
+ARG UNAME=$HOST_USER
+ARG UID=1000
+ARG GID=1000
+ARG HOME=/home/${UNAME}
+
 ENV DEBCONF_NOWARNINGS="yes"
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 
-ENV HOST_USER="user2"
-ENV UNAME="user2"
-ENV UID=1000
-ENV GID=1000
-ENV HOME="/home/user2"
-
 RUN apt-get autoremove --purge --yes \
-	&& rm -rf /var/ib/apt/lists/* \
+	&& rm -rf /var/lib/apt/lists/* \
 	&& rm -rf /etc/ros/rosdep/sources.list.d/20-default.list
+
 
 RUN apt-get update && apt-get install -y --no-install-recommends apt-utils
 RUN apt-get install -y language-pack-ko
@@ -26,6 +27,10 @@ RUN apt-get install -y bash expect sudo
 RUN apt-get install -y chrony ntpdate build-essential curl nano
 RUN apt-get install -y lsb-release
 
+RUN apt-get --fix-missing update \
+	&& apt-get update \
+	&& apt-get install -f
+
 RUN apt-get install -y \
 	tmux \
 	wget \
@@ -37,8 +42,7 @@ RUN apt-get install -y \
 	unzip \
 	locales \
 	ntp \
-	whois \
-	net-tools
+	whois
 
 #RUN locale-gen ko_KR.UTF-8
 
@@ -63,8 +67,10 @@ RUN mkdir -p /etc/sudoers.d && \
 #USER ${UNAME}
 #WORKDIR $HOME
 
-COPY --chown=${UNAME}:${UNAME} ./workspace /home/${HOST_USER}/workspace
-COPY --chown=${UNAME}:${UNAME} ./proj /home/${UNAME}/proj
+#COPY --chown=1000:1000 workspace /home/${UNAME}/workspace
+#COPY --chown=1000:1000 proj /home/${UNAME}/proj
+#COPY --chown=eddi:eddi workspace /home/${UNAME}/workspace
+#COPY --chown=eddi:eddi proj /home/${UNAME}/proj
 
 USER ${UNAME}
 ENV HOME /home/${UNAME}

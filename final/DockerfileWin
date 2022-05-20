@@ -1,15 +1,14 @@
 FROM osrf/ros:melodic-desktop-full-bionic
 
-ARG DEBIAN_FRONTEND=noninteractive
-ARG HOST_USER
-ARG UNAME=$HOST_USER
-ARG UID=1000
-ARG GID=1000
-#ARG HOME=/home/${UNAME}
-ARG HOME=/home/${HOST_USER}
-
+ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS="yes"
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
+
+ENV HOST_USER="user2"
+ENV UNAME="user2"
+ENV UID=1000
+ENV GID=1000
+ENV HOME="/home/user2"
 
 RUN apt-get autoremove --purge --yes \
 	&& rm -rf /var/ib/apt/lists/* \
@@ -64,7 +63,7 @@ RUN mkdir -p /etc/sudoers.d && \
 #USER ${UNAME}
 #WORKDIR $HOME
 
-COPY --chown=${HOST_USER}:${HOST_USER} ./workspace /home/${HOST_USER}/workspace
+COPY --chown=${UNAME}:${UNAME} ./workspace /home/${HOST_USER}/workspace
 COPY --chown=${UNAME}:${UNAME} ./proj /home/${UNAME}/proj
 
 USER ${UNAME}

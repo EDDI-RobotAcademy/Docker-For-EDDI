@@ -1,21 +1,5 @@
 #!/usr/bin/bash
 
-# 정리
-#docker rmi -f $(docker images -q)
-#docker rm -f $(docker ps -qa)
-
-# OSRF 재단 배포 이미지
-#docker pull osrf/ros:melodic-desktop-full-bionic
-
-# id에 docker 등록 여부 판정
-#expect << EOF
-#spawn id
-#expect {
-#	"(docker)" { send "이미 존재함\r"; exp_continue }
-#	eof
-#}
-#EOF
-
 id_res=$(id | grep docker)
 
 if [ -n "$id_res" ];
@@ -23,17 +7,16 @@ then echo "docker가 이미 등록되어 있습니다!"
 else
 	echo "지금부터 docker를 등록합니다!"
 	sudo usermod -aG docker $USER
-	newgrp docker
+	#newgrp docker
 	exit
 fi
 
 docker_check=$(docker images | awk '{ print $1 }' | grep "ros/melodic")
 if [ -n "$docker_check" ];
-then
+then echo "이미 설치되어 있습니다!"
+else
 	echo "도커 이미지 설치!"
 	docker build --no-cache --force-rm -f Dockerfile --build-arg HOST_USER=$USER -t ros/melodic:dev .
-else
-	echo "이미 설치되어 있습니다!"
 fi
 
 USER_UID=$(id -u)
@@ -61,6 +44,7 @@ for ((a=0; a<"${#args[@]}"; ++a)); do
 	esac
 done
 
+cur_loc=$(pwd)
 docker run -it \
 	--init \
 	--ipc=host \
@@ -79,9 +63,8 @@ docker run -it \
 	${ENV_PARAMS[@]} \
 	-v /dev:/dev \
 	-v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-	-v workspace:/home/$USER/workspace \
-	--name=$TAG \
-	$IMAGE \
+	-v $cur_loc/workspace:/home/$USER/workspace \
+	ros/melodic:dev \
 	${OTHER_PARAMS[@]} \
 	/bin/bash
 
